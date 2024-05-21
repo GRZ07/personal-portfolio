@@ -94,6 +94,108 @@ const filterFunc = function (selectedValue) {
 
 }
 
+document.addEventListener("DOMContentLoaded", function() {
+  let popupOpen = false;
+
+  function showPopup(title, customDescription, githubUrl) {
+    // Close any existing popup
+    closePopup();
+
+    // Create the popup widget
+    const popup = document.createElement('div');
+    popup.classList.add('popup-widget', 'active');
+
+    // Add content to the popup
+    popup.innerHTML = `
+      <div class="popup-content">
+        <h2>${title}</h2>
+        <p style="text-align: start;">${customDescription}</p>
+        <a href="${githubUrl}" target="_blank" class="github-button">
+          <ion-icon name="logo-github"></ion-icon>
+        </a>
+      </div>
+    `;
+
+    // Append the popup to the body
+    document.body.appendChild(popup);
+
+    // Create and append the overlay
+    const overlay = document.createElement('div');
+    overlay.classList.add('overlay', 'active');
+    document.body.appendChild(overlay);
+
+    // Add click event listener to overlay
+    overlay.addEventListener('click', closePopup);
+
+    // Disable scroll on the body
+    document.body.style.overflow = "hidden";
+
+    // Set popupOpen to true
+    popupOpen = true;
+
+    // Add scroll functionality to popup content
+    const popupContent = document.querySelector('.popup-content');
+    popupContent.addEventListener('scroll', function() {
+      if (popupContent.scrollHeight > popupContent.clientHeight) {
+        popupContent.style.overflowY = 'auto';
+      } else {
+        popupContent.style.overflowY = 'hidden';
+      }
+    });
+  }
+
+  function closePopup() {
+    const popup = document.querySelector('.popup-widget');
+    if (popup) {
+      // Remove the popup with a delay to allow transition animation
+      popup.classList.remove('active');
+      setTimeout(() => {
+        popup.parentNode.removeChild(popup);
+      }, 300); // Delay to allow transition animation
+    }
+
+    // Remove the overlay
+    const overlay = document.querySelector('.overlay');
+    if (overlay) {
+      overlay.classList.remove('active');
+      setTimeout(() => {
+        overlay.parentNode.removeChild(overlay);
+      }, 300); // Delay to allow transition animation
+    }
+
+    // Enable scroll on the body
+    document.body.style.overflow = "";
+
+    // Set popupOpen to false
+    popupOpen = false;
+  }
+
+  // Show popup when list element is clicked
+  const listItems = document.querySelectorAll(".project-item");
+  listItems.forEach(function(item) {
+    item.addEventListener("click", function(event) {
+      event.preventDefault();
+      const title = this.querySelector(".project-title").textContent;
+      const customDescription = this.getAttribute("data-description");
+      const githubUrl = this.getAttribute("data-github-url");
+      showPopup(title, customDescription, githubUrl);
+    });
+  });
+});
+
+
+
+
+
+
+  // Hide popup when overlay is clicked
+  overlay.addEventListener("click", function(event) {
+    if (event.target === overlay && popupOpen) {
+      closePopup();
+    }
+  });
+
+
 // add event in all filter button items for large screen
 let lastClickedBtn = filterBtn[0];
 
